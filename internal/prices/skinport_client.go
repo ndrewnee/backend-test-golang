@@ -36,7 +36,7 @@ func NewClient(rawBaseURL string, timeout time.Duration) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) FetchItems(ctx context.Context, appID int, currency string, tradable bool) ([]Item, error) {
+func (c *Client) FetchItems(ctx context.Context, appID int, currency string, tradable bool) ([]SkinportItem, error) {
 	endpoint := *c.baseURL
 	endpoint.Path = strings.TrimRight(endpoint.Path, "/") + "/items"
 
@@ -78,7 +78,7 @@ func (c *Client) FetchItems(ctx context.Context, appID int, currency string, tra
 	decoder := json.NewDecoder(reader)
 	decoder.UseNumber()
 
-	var items []Item
+	var items []SkinportItem
 	if err := decoder.Decode(&items); err != nil {
 		return nil, fmt.Errorf("decode skinport response: %w", err)
 	}

@@ -26,7 +26,7 @@ var supportedCurrencies = map[string]struct{}{
 }
 
 type Fetcher interface {
-	FetchItems(ctx context.Context, appID int, currency string, tradable bool) ([]Item, error)
+	FetchItems(ctx context.Context, appID int, currency string, tradable bool) ([]SkinportItem, error)
 }
 
 type Service struct {
@@ -107,8 +107,8 @@ func NormalizeQuery(appID int, currency string) (int, string, error) {
 }
 
 func (s *Service) fetchAndMerge(ctx context.Context, appID int, currency string) ([]dto.PriceItem, error) {
-	var tradableItems []Item
-	var nonTradableItems []Item
+	var tradableItems []SkinportItem
+	var nonTradableItems []SkinportItem
 
 	group, ctx := errgroup.WithContext(ctx)
 	group.Go(func() error {
@@ -129,7 +129,7 @@ func (s *Service) fetchAndMerge(ctx context.Context, appID int, currency string)
 	return mergeItems(tradableItems, nonTradableItems), nil
 }
 
-func mergeItems(tradableItems, nonTradableItems []Item) []dto.PriceItem {
+func mergeItems(tradableItems, nonTradableItems []SkinportItem) []dto.PriceItem {
 	byName := make(map[string]*dto.PriceItem, len(tradableItems)+len(nonTradableItems))
 
 	for _, item := range tradableItems {

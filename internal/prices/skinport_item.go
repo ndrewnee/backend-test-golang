@@ -6,7 +6,7 @@ import (
 	"github.com/ndrewnee/backend-test-golang/internal/dto"
 )
 
-type Item struct {
+type SkinportItem struct {
 	MarketHashName string       `json:"market_hash_name"`
 	Currency       string       `json:"currency"`
 	SuggestedPrice *json.Number `json:"suggested_price"`
@@ -21,7 +21,7 @@ type Item struct {
 	UpdatedAt      int64        `json:"updated_at"`
 }
 
-func priceItemFromSkinport(item Item) dto.PriceItem {
+func priceItemFromSkinport(item SkinportItem) dto.PriceItem {
 	return dto.PriceItem{
 		MarketHashName:    item.MarketHashName,
 		Currency:          item.Currency,
