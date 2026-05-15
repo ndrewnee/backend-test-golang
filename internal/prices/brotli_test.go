@@ -1,4 +1,4 @@
-package skinport
+package prices
 
 import (
 	"io"

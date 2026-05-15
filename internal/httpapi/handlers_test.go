@@ -13,7 +13,7 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ndrewnee/backend-test-golang/internal/skinport"
+	"github.com/ndrewnee/backend-test-golang/internal/prices"
 	"github.com/ndrewnee/backend-test-golang/internal/users"
 )
 
@@ -52,7 +52,7 @@ func TestItemsPrices(t *testing.T) {
 	t.Parallel()
 
 	router := NewRouter(stubPriceService{
-		items: []skinport.PriceItem{{
+		items: []prices.PriceItem{{
 			MarketHashName: "AK-47",
 			Currency:       "EUR",
 		}},
@@ -66,7 +66,7 @@ func TestItemsPrices(t *testing.T) {
 	require.Equal(t, http.StatusOK, res.Code, res.Body.String())
 
 	var response struct {
-		Items []skinport.PriceItem `json:"items"`
+		Items []prices.PriceItem `json:"items"`
 	}
 	require.NoError(t, json.NewDecoder(res.Body).Decode(&response))
 	require.Len(t, response.Items, 1)
@@ -87,11 +87,11 @@ func TestItemsPricesValidation(t *testing.T) {
 }
 
 type stubPriceService struct {
-	items []skinport.PriceItem
+	items []prices.PriceItem
 	err   error
 }
 
-func (s stubPriceService) Prices(_ context.Context, _ int, _ string) ([]skinport.PriceItem, error) {
+func (s stubPriceService) Prices(_ context.Context, _ int, _ string) ([]prices.PriceItem, error) {
 	return s.items, s.err
 }
 

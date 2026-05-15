@@ -19,7 +19,7 @@ import (
 
 	"github.com/ndrewnee/backend-test-golang/internal/db"
 	"github.com/ndrewnee/backend-test-golang/internal/httpapi"
-	"github.com/ndrewnee/backend-test-golang/internal/skinport"
+	"github.com/ndrewnee/backend-test-golang/internal/prices"
 	"github.com/ndrewnee/backend-test-golang/internal/users"
 )
 
@@ -41,11 +41,11 @@ func TestRoutesIntegration(t *testing.T) {
 	skinportServer, skinportCalls := newSkinportIntegrationServer()
 	defer skinportServer.Close()
 
-	skinportClient, err := skinport.NewClient(skinportServer.URL, time.Second)
+	skinportClient, err := prices.NewClient(skinportServer.URL, time.Second)
 	require.NoError(t, err)
 
 	router := httpapi.NewRouter(
-		skinport.NewService(skinportClient, time.Minute),
+		prices.NewService(skinportClient, time.Minute),
 		users.NewStore(pool),
 	)
 	server := httptest.NewServer(router)
@@ -61,7 +61,7 @@ func TestRoutesIntegration(t *testing.T) {
 		require.Equal(t, http.StatusOK, resp.StatusCode)
 
 		var body struct {
-			Items []skinport.PriceItem `json:"items"`
+			Items []prices.PriceItem `json:"items"`
 		}
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&body))
 		require.Len(t, body.Items, 1)

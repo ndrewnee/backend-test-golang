@@ -15,7 +15,7 @@ import (
 	"github.com/ndrewnee/backend-test-golang/internal/config"
 	"github.com/ndrewnee/backend-test-golang/internal/db"
 	"github.com/ndrewnee/backend-test-golang/internal/httpapi"
-	"github.com/ndrewnee/backend-test-golang/internal/skinport"
+	"github.com/ndrewnee/backend-test-golang/internal/prices"
 	"github.com/ndrewnee/backend-test-golang/internal/users"
 )
 
@@ -51,12 +51,12 @@ func run() error {
 		}
 	}
 
-	skinportClient, err := skinport.NewClient(cfg.SkinportBaseURL, cfg.SkinportTimeout)
+	skinportClient, err := prices.NewClient(cfg.SkinportBaseURL, cfg.SkinportTimeout)
 	if err != nil {
 		return err
 	}
 
-	priceService := skinport.NewService(skinportClient, cfg.SkinportCacheTTL)
+	priceService := prices.NewService(skinportClient, cfg.SkinportCacheTTL)
 	userStore := users.NewStore(pool)
 
 	server := &http.Server{

@@ -7,12 +7,12 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/shopspring/decimal"
 
-	"github.com/ndrewnee/backend-test-golang/internal/skinport"
+	"github.com/ndrewnee/backend-test-golang/internal/prices"
 	"github.com/ndrewnee/backend-test-golang/internal/users"
 )
 
 type PriceService interface {
-	Prices(ctx context.Context, appID int, currency string) ([]skinport.PriceItem, error)
+	Prices(ctx context.Context, appID int, currency string) ([]prices.PriceItem, error)
 }
 
 type UserService interface {

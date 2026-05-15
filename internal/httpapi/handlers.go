@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/ndrewnee/backend-test-golang/internal/money"
-	"github.com/ndrewnee/backend-test-golang/internal/skinport"
+	"github.com/ndrewnee/backend-test-golang/internal/prices"
 	"github.com/ndrewnee/backend-test-golang/internal/users"
 )
 
@@ -44,7 +44,7 @@ func (h *Handler) itemsPrices(w http.ResponseWriter, r *http.Request) {
 
 	items, err := h.priceService.Prices(r.Context(), appID, r.URL.Query().Get("currency"))
 	if err != nil {
-		if errors.Is(err, skinport.ErrUnsupportedCurrency) || errors.Is(err, skinport.ErrInvalidAppID) {
+		if errors.Is(err, prices.ErrUnsupportedCurrency) || errors.Is(err, prices.ErrInvalidAppID) {
 			writeError(w, http.StatusBadRequest, err.Error())
 			return
 		}
