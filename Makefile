@@ -1,4 +1,6 @@
-.PHONY: run fmt test test-integration lint build up down
+.PHONY: run fmt test test-integration test-down lint build up down
+
+TEST_COMPOSE := docker compose -p backend-test-golang-test -f docker-compose.test.yml
 
 run:
 	go run ./cmd/server
@@ -17,8 +19,11 @@ lint:
 	golangci-lint run ./...
 
 test-integration:
-	docker compose --profile test up -d test-db
-	docker compose --profile test run --rm test go test -tags=integration ./tests/integration -count=1
+	$(TEST_COMPOSE) up -d --wait --force-recreate test-db
+	$(TEST_COMPOSE) run --rm test go test -tags=integration ./tests/integration -count=1
+
+test-down:
+	$(TEST_COMPOSE) down --remove-orphans
 
 build:
 	go build -o backend-test ./cmd/server
