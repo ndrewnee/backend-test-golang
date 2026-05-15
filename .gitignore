@@ -1,0 +1,5 @@
+.DS_Store
+.env
+/backend-test
+/tmp/
+/coverage.out

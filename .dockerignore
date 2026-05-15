@@ -1,0 +1,6 @@
+.git
+.env
+.DS_Store
+backend-test
+tmp/
+coverage.out

@@ -1,0 +1,20 @@
+.PHONY: run test test-integration build up down
+
+run:
+	go run ./cmd/server
+
+test:
+	go test ./...
+
+test-integration:
+	docker compose up -d db
+	docker compose run --rm test go test ./internal/users -run Integration -count=1
+
+build:
+	go build -o backend-test ./cmd/server
+
+up:
+	docker compose up --build
+
+down:
+	docker compose down --remove-orphans
