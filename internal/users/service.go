@@ -10,15 +10,15 @@ import (
 	"github.com/ndrewnee/backend-test-golang/internal/money"
 )
 
-type debitRepository interface {
+type UserRepository interface {
 	Debit(ctx context.Context, userID int64, amount decimal.Decimal) (models.BalanceDebit, error)
 }
 
 type Service struct {
-	repo debitRepository
+	repo UserRepository
 }
 
-func NewService(repo debitRepository) *Service {
+func NewService(repo UserRepository) *Service {
 	return &Service{repo: repo}
 }
 

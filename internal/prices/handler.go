@@ -11,15 +11,15 @@ import (
 	"github.com/ndrewnee/backend-test-golang/internal/dto"
 )
 
-type priceService interface {
+type PriceService interface {
 	Prices(ctx context.Context, appID int, currency string) ([]dto.PriceItem, error)
 }
 
 type Handler struct {
-	service priceService
+	service PriceService
 }
 
-func NewHandler(service priceService) *Handler {
+func NewHandler(service PriceService) *Handler {
 	return &Handler{service: service}
 }
 

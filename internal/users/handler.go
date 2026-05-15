@@ -12,15 +12,15 @@ import (
 	"github.com/ndrewnee/backend-test-golang/internal/dto"
 )
 
-type debitService interface {
+type UserService interface {
 	Debit(ctx context.Context, userID int64, request dto.DebitRequest) (dto.DebitResponse, error)
 }
 
 type Handler struct {
-	service debitService
+	service UserService
 }
 
-func NewHandler(service debitService) *Handler {
+func NewHandler(service UserService) *Handler {
 	return &Handler{service: service}
 }
 
