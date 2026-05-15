@@ -171,6 +171,9 @@ func (s *Service) getCached(key string) ([]dto.Item, bool) {
 
 	entry, ok := s.cache[key]
 	if !ok || !s.now().Before(entry.expiresAt) {
+		if ok {
+			delete(s.cache, key)
+		}
 		return nil, false
 	}
 	return cloneItems(entry.items), true
