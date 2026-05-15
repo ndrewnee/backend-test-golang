@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ndrewnee/backend-test-golang/internal/dto"
@@ -35,8 +34,8 @@ func TestHandlerDebitUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			router := chi.NewRouter()
-			router.Post("/users/{id}/debit", NewHandler(&stubUserService{err: tt.serviceErr}).DebitUser)
+			router := http.NewServeMux()
+			router.HandleFunc("POST /users/{id}/debit", NewHandler(&stubUserService{err: tt.serviceErr}).DebitUser)
 			req := httptest.NewRequest(http.MethodPost, tt.path, bytes.NewBufferString(tt.body))
 			res := httptest.NewRecorder()
 

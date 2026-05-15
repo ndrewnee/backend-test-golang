@@ -4,18 +4,16 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
-
 	"github.com/ndrewnee/backend-test-golang/internal/dto"
 	"github.com/ndrewnee/backend-test-golang/internal/prices"
 	"github.com/ndrewnee/backend-test-golang/internal/users"
 )
 
 func NewRouter(priceHandler *prices.Handler, userHandler *users.Handler) http.Handler {
-	router := chi.NewRouter()
-	router.Get("/healthz", healthz)
-	router.Get("/items/prices", priceHandler.ItemsPrices)
-	router.Post("/users/{id}/debit", userHandler.DebitUser)
+	router := http.NewServeMux()
+	router.HandleFunc("GET /healthz", healthz)
+	router.HandleFunc("GET /items/prices", priceHandler.ItemsPrices)
+	router.HandleFunc("POST /users/{id}/debit", userHandler.DebitUser)
 
 	return router
 }

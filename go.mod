@@ -4,7 +4,6 @@ go 1.25.0
 
 require (
 	github.com/andybalholm/brotli v1.2.1
-	github.com/go-chi/chi/v5 v5.2.5
 	github.com/jackc/pgx/v5 v5.9.2
 	github.com/shopspring/decimal v1.4.0
 	github.com/stretchr/testify v1.11.1

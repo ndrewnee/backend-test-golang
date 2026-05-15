@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/go-chi/chi/v5"
-
 	"github.com/ndrewnee/backend-test-golang/internal/dto"
 )
 
@@ -25,7 +23,7 @@ func NewHandler(service UserService) *Handler {
 }
 
 func (h *Handler) DebitUser(w http.ResponseWriter, r *http.Request) {
-	userID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	userID, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil || userID <= 0 {
 		writeError(w, http.StatusBadRequest, "user id must be a positive integer")
 		return
