@@ -1,4 +1,4 @@
-package prices
+package items
 
 import (
 	"context"
@@ -40,7 +40,7 @@ type Service struct {
 }
 
 type cacheEntry struct {
-	items     []dto.PriceItem
+	items     []dto.Item
 	expiresAt time.Time
 }
 
@@ -53,7 +53,7 @@ func NewService(fetcher Fetcher, ttl time.Duration) *Service {
 	}
 }
 
-func (s *Service) Prices(ctx context.Context, appID int, currency string) ([]dto.PriceItem, error) {
+func (s *Service) Items(ctx context.Context, appID int, currency string) ([]dto.Item, error) {
 	appID, currency, err := NormalizeQuery(appID, currency)
 	if err != nil {
 		return nil, err
@@ -74,17 +74,17 @@ func (s *Service) Prices(ctx context.Context, appID int, currency string) ([]dto
 			return nil, err
 		}
 		s.setCached(key, items)
-		return clonePriceItems(items), nil
+		return cloneItems(items), nil
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	items, ok := value.([]dto.PriceItem)
+	items, ok := value.([]dto.Item)
 	if !ok {
 		return nil, fmt.Errorf("unexpected cache value type")
 	}
-	return clonePriceItems(items), nil
+	return cloneItems(items), nil
 }
 
 func NormalizeQuery(appID int, currency string) (int, string, error) {
@@ -106,7 +106,7 @@ func NormalizeQuery(appID int, currency string) (int, string, error) {
 	return appID, currency, nil
 }
 
-func (s *Service) fetchAndMerge(ctx context.Context, appID int, currency string) ([]dto.PriceItem, error) {
+func (s *Service) fetchAndMerge(ctx context.Context, appID int, currency string) ([]dto.Item, error) {
 	var tradableItems []SkinportItem
 	var nonTradableItems []SkinportItem
 
@@ -129,11 +129,11 @@ func (s *Service) fetchAndMerge(ctx context.Context, appID int, currency string)
 	return mergeItems(tradableItems, nonTradableItems), nil
 }
 
-func mergeItems(tradableItems, nonTradableItems []SkinportItem) []dto.PriceItem {
-	byName := make(map[string]*dto.PriceItem, len(tradableItems)+len(nonTradableItems))
+func mergeItems(tradableItems, nonTradableItems []SkinportItem) []dto.Item {
+	byName := make(map[string]*dto.Item, len(tradableItems)+len(nonTradableItems))
 
 	for _, item := range tradableItems {
-		price := priceItemFromSkinport(item)
+		price := itemFromSkinport(item)
 		price.TradableMinPrice = jsonNumberString(item.MinPrice)
 		price.TradableQuantity = item.Quantity
 		byName[item.MarketHashName] = &price
@@ -142,7 +142,7 @@ func mergeItems(tradableItems, nonTradableItems []SkinportItem) []dto.PriceItem 
 	for _, item := range nonTradableItems {
 		price, ok := byName[item.MarketHashName]
 		if !ok {
-			newPrice := priceItemFromSkinport(item)
+			newPrice := itemFromSkinport(item)
 			price = &newPrice
 			byName[item.MarketHashName] = price
 		}
@@ -150,7 +150,7 @@ func mergeItems(tradableItems, nonTradableItems []SkinportItem) []dto.PriceItem 
 		price.NonTradableQuantity = item.Quantity
 	}
 
-	merged := make([]dto.PriceItem, 0, len(byName))
+	merged := make([]dto.Item, 0, len(byName))
 	for _, item := range byName {
 		merged = append(merged, *item)
 	}
@@ -165,7 +165,7 @@ func cacheKey(appID int, currency string) string {
 	return fmt.Sprintf("%d:%s", appID, currency)
 }
 
-func (s *Service) getCached(key string) ([]dto.PriceItem, bool) {
+func (s *Service) getCached(key string) ([]dto.Item, bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -173,24 +173,24 @@ func (s *Service) getCached(key string) ([]dto.PriceItem, bool) {
 	if !ok || !s.now().Before(entry.expiresAt) {
 		return nil, false
 	}
-	return clonePriceItems(entry.items), true
+	return cloneItems(entry.items), true
 }
 
-func (s *Service) setCached(key string, items []dto.PriceItem) {
+func (s *Service) setCached(key string, items []dto.Item) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	s.cache[key] = cacheEntry{
-		items:     clonePriceItems(items),
+		items:     cloneItems(items),
 		expiresAt: s.now().Add(s.ttl),
 	}
 }
 
-func clonePriceItems(items []dto.PriceItem) []dto.PriceItem {
+func cloneItems(items []dto.Item) []dto.Item {
 	if items == nil {
 		return nil
 	}
-	cloned := make([]dto.PriceItem, len(items))
+	cloned := make([]dto.Item, len(items))
 	copy(cloned, items)
 	return cloned
 }

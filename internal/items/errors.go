@@ -1,4 +1,4 @@
-package prices
+package items
 
 import "errors"
 

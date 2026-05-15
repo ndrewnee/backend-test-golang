@@ -5,14 +5,14 @@ import (
 	"net/http"
 
 	"github.com/ndrewnee/backend-test-golang/internal/dto"
-	"github.com/ndrewnee/backend-test-golang/internal/prices"
+	"github.com/ndrewnee/backend-test-golang/internal/items"
 	"github.com/ndrewnee/backend-test-golang/internal/users"
 )
 
-func NewRouter(priceHandler *prices.Handler, userHandler *users.Handler) http.Handler {
+func NewRouter(itemsHandler *items.Handler, userHandler *users.Handler) http.Handler {
 	router := http.NewServeMux()
 	router.HandleFunc("GET /healthz", healthz)
-	router.HandleFunc("GET /items/prices", priceHandler.ItemsPrices)
+	router.HandleFunc("GET /items", itemsHandler.Items)
 	router.HandleFunc("POST /users/{id}/debit", userHandler.DebitUser)
 
 	return router

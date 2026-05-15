@@ -1,4 +1,4 @@
-package prices
+package items
 
 import (
 	"context"
@@ -11,19 +11,19 @@ import (
 	"github.com/ndrewnee/backend-test-golang/internal/dto"
 )
 
-type PriceService interface {
-	Prices(ctx context.Context, appID int, currency string) ([]dto.PriceItem, error)
+type ItemsService interface {
+	Items(ctx context.Context, appID int, currency string) ([]dto.Item, error)
 }
 
 type Handler struct {
-	service PriceService
+	service ItemsService
 }
 
-func NewHandler(service PriceService) *Handler {
+func NewHandler(service ItemsService) *Handler {
 	return &Handler{service: service}
 }
 
-func (h *Handler) ItemsPrices(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Items(w http.ResponseWriter, r *http.Request) {
 	appID := 0
 	if raw := r.URL.Query().Get("app_id"); raw != "" {
 		parsed, err := strconv.Atoi(raw)
@@ -34,7 +34,7 @@ func (h *Handler) ItemsPrices(w http.ResponseWriter, r *http.Request) {
 		appID = parsed
 	}
 
-	items, err := h.service.Prices(r.Context(), appID, r.URL.Query().Get("currency"))
+	items, err := h.service.Items(r.Context(), appID, r.URL.Query().Get("currency"))
 	if err != nil {
 		if errors.Is(err, ErrUnsupportedCurrency) || errors.Is(err, ErrInvalidAppID) {
 			writeError(w, http.StatusBadRequest, err.Error())
@@ -44,12 +44,12 @@ func (h *Handler) ItemsPrices(w http.ResponseWriter, r *http.Request) {
 			writeError(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		slog.Warn("failed to fetch item prices", "error", err)
-		writeError(w, http.StatusBadGateway, "failed to fetch item prices")
+		slog.Warn("failed to fetch items", "error", err)
+		writeError(w, http.StatusBadGateway, "failed to fetch items")
 		return
 	}
 
-	writeJSON(w, http.StatusOK, dto.ItemsPricesResponse{Items: items})
+	writeJSON(w, http.StatusOK, dto.ItemsResponse{Items: items})
 }
 
 func writeJSON(w http.ResponseWriter, status int, value any) {

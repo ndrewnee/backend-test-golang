@@ -1,10 +1,10 @@
 package dto
 
-type ItemsPricesResponse struct {
-	Items []PriceItem `json:"items"`
+type ItemsResponse struct {
+	Items []Item `json:"items"`
 }
 
-type PriceItem struct {
+type Item struct {
 	MarketHashName      string  `json:"market_hash_name"`
 	Currency            string  `json:"currency"`
 	SuggestedPrice      *string `json:"suggested_price"`

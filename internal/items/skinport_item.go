@@ -1,4 +1,4 @@
-package prices
+package items
 
 import (
 	"encoding/json"
@@ -21,8 +21,8 @@ type SkinportItem struct {
 	UpdatedAt      int64        `json:"updated_at"`
 }
 
-func priceItemFromSkinport(item SkinportItem) dto.PriceItem {
-	return dto.PriceItem{
+func itemFromSkinport(item SkinportItem) dto.Item {
+	return dto.Item{
 		MarketHashName:    item.MarketHashName,
 		Currency:          item.Currency,
 		SuggestedPrice:    jsonNumberString(item.SuggestedPrice),

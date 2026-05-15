@@ -15,7 +15,7 @@ A small Go HTTP service for the backend test assignment. It fetches Skinport ite
 | `DATABASE_URL` | `postgres://postgres:postgres@localhost:5432/backend_test?sslmode=disable` | Postgres connection DSN |
 | `HTTP_ADDR` | `:8080` | HTTP server address |
 | `SKINPORT_BASE_URL` | `https://api.skinport.com/v1` | Skinport API base URL |
-| `SKINPORT_CACHE_TTL` | `5m` | In-memory cache TTL for `/items/prices` |
+| `SKINPORT_CACHE_TTL` | `5m` | In-memory cache TTL for `/items` |
 | `SKINPORT_TIMEOUT` | `10s` | Timeout for Skinport HTTP requests |
 | `RUN_MIGRATIONS` | `true` | Run SQL migrations on application startup |
 
@@ -51,10 +51,10 @@ Response:
 {"status":"ok"}
 ```
 
-### Skinport prices
+### Skinport items
 
 ```bash
-curl 'http://localhost:8080/items/prices?app_id=730&currency=USD'
+curl 'http://localhost:8080/items?app_id=730&currency=USD'
 ```
 
 The `app_id` and `currency` query parameters are optional. Defaults are `730` and `EUR`.

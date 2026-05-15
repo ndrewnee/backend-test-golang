@@ -14,7 +14,7 @@ import (
 	"github.com/ndrewnee/backend-test-golang/internal/dto"
 )
 
-func TestPricesIntegration(t *testing.T) {
+func TestItemsIntegration(t *testing.T) {
 	_, pool := openIntegrationDB(t)
 
 	skinportServer, skinportCalls := newSkinportIntegrationServer()
@@ -22,7 +22,7 @@ func TestPricesIntegration(t *testing.T) {
 
 	server := newIntegrationServer(t, pool, skinportServer.URL)
 
-	resp, err := server.Client().Get(server.URL + "/items/prices?app_id=730&currency=USD")
+	resp, err := server.Client().Get(server.URL + "/items?app_id=730&currency=USD")
 	require.NoError(t, err)
 	defer func() {
 		_ = resp.Body.Close()
@@ -30,7 +30,7 @@ func TestPricesIntegration(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 
-	var body dto.ItemsPricesResponse
+	var body dto.ItemsResponse
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&body))
 	require.Len(t, body.Items, 1)
 	require.Equal(t, "AK-47", body.Items[0].MarketHashName)

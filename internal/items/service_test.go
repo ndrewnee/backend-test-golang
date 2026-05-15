@@ -1,4 +1,4 @@
-package prices
+package items
 
 import (
 	"context"
@@ -50,9 +50,9 @@ func TestServicePricesMergesAndCachesSkinportItems(t *testing.T) {
 	require.NoError(t, err)
 	service := NewService(client, time.Minute)
 
-	first, err := service.Prices(context.Background(), 730, "usd")
+	first, err := service.Items(context.Background(), 730, "usd")
 	require.NoError(t, err)
-	second, err := service.Prices(context.Background(), 730, "USD")
+	second, err := service.Items(context.Background(), 730, "USD")
 	require.NoError(t, err)
 
 	require.Equal(t, int64(2), calls.Load())

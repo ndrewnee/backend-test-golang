@@ -14,7 +14,7 @@ import (
 
 	"github.com/ndrewnee/backend-test-golang/internal/db"
 	"github.com/ndrewnee/backend-test-golang/internal/httpapi"
-	"github.com/ndrewnee/backend-test-golang/internal/prices"
+	"github.com/ndrewnee/backend-test-golang/internal/items"
 	"github.com/ndrewnee/backend-test-golang/internal/users"
 )
 
@@ -41,15 +41,15 @@ func openIntegrationDB(t *testing.T) (context.Context, *pgxpool.Pool) {
 func newIntegrationServer(t *testing.T, pool *pgxpool.Pool, skinportBaseURL string) *httptest.Server {
 	t.Helper()
 
-	skinportClient, err := prices.NewClient(skinportBaseURL, time.Second)
+	skinportClient, err := items.NewClient(skinportBaseURL, time.Second)
 	require.NoError(t, err)
 
-	priceService := prices.NewService(skinportClient, time.Minute)
+	itemsService := items.NewService(skinportClient, time.Minute)
 	userRepository := users.NewRepository(pool)
 	userService := users.NewService(userRepository)
 
 	server := httptest.NewServer(httpapi.NewRouter(
-		prices.NewHandler(priceService),
+		items.NewHandler(itemsService),
 		users.NewHandler(userService),
 	))
 	t.Cleanup(server.Close)
