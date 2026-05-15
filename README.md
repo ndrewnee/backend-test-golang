@@ -143,9 +143,11 @@ make test-integration
 ```
 
 Integration tests live in `tests/integration` behind the `integration` build tag. They use `TEST_DATABASE_URL`, cover both HTTP business routes, and verify concurrent debits so that the balance cannot go below zero.
+`make test-integration` uses a separate Docker Postgres service, `test-db`, published on `localhost:5433`, so it does not touch the development database on `localhost:5432`.
 
 Manual integration run:
 
 ```bash
-TEST_DATABASE_URL='postgres://postgres:postgres@localhost:5432/backend_test?sslmode=disable' go test -tags=integration ./tests/integration -count=1
+docker compose --profile test up -d test-db
+TEST_DATABASE_URL='postgres://postgres:postgres@localhost:5433/backend_test?sslmode=disable' go test -tags=integration ./tests/integration -count=1
 ```

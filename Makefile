@@ -17,8 +17,8 @@ lint:
 	golangci-lint run ./...
 
 test-integration:
-	docker compose up -d db
-	docker compose run --rm test go test -tags=integration ./tests/integration -count=1
+	docker compose --profile test up -d test-db
+	docker compose --profile test run --rm test go test -tags=integration ./tests/integration -count=1
 
 build:
 	go build -o backend-test ./cmd/server
