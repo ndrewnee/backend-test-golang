@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+
 	"github.com/ndrewnee/backend-test-golang/internal/money"
 	"github.com/ndrewnee/backend-test-golang/internal/skinport"
 	"github.com/ndrewnee/backend-test-golang/internal/users"

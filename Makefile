@@ -1,7 +1,14 @@
-.PHONY: run test test-integration lint build up down
+.PHONY: run fmt test test-integration lint build up down
 
 run:
 	go run ./cmd/server
+
+fmt:
+	@if command -v goimports >/dev/null 2>&1; then \
+		goimports -w -local github.com/ndrewnee/backend-test-golang .; \
+	else \
+		go fmt ./...; \
+	fi
 
 test:
 	go test ./...

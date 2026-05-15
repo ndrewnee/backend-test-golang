@@ -15,11 +15,12 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/stretchr/testify/require"
+
 	"github.com/ndrewnee/backend-test-golang/internal/db"
 	"github.com/ndrewnee/backend-test-golang/internal/httpapi"
 	"github.com/ndrewnee/backend-test-golang/internal/skinport"
 	"github.com/ndrewnee/backend-test-golang/internal/users"
-	"github.com/stretchr/testify/require"
 )
 
 func TestRoutesIntegration(t *testing.T) {

@@ -8,8 +8,9 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/ndrewnee/backend-test-golang/internal/money"
 	"github.com/shopspring/decimal"
+
+	"github.com/ndrewnee/backend-test-golang/internal/money"
 )
 
 var (

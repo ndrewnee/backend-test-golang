@@ -124,6 +124,12 @@ Unit and HTTP tests:
 go test ./...
 ```
 
+Format:
+
+```bash
+make fmt
+```
+
 Lint:
 
 ```bash

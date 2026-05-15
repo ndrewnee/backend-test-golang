@@ -11,9 +11,10 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/stretchr/testify/require"
+
 	"github.com/ndrewnee/backend-test-golang/internal/db"
 	"github.com/ndrewnee/backend-test-golang/internal/money"
-	"github.com/stretchr/testify/require"
 )
 
 func TestDebitConcurrentIntegration(t *testing.T) {

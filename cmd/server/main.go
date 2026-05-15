@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/ndrewnee/backend-test-golang/internal/config"
 	"github.com/ndrewnee/backend-test-golang/internal/db"
 	"github.com/ndrewnee/backend-test-golang/internal/httpapi"

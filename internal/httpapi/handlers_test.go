@@ -10,10 +10,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ndrewnee/backend-test-golang/internal/skinport"
-	"github.com/ndrewnee/backend-test-golang/internal/users"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ndrewnee/backend-test-golang/internal/skinport"
+	"github.com/ndrewnee/backend-test-golang/internal/users"
 )
 
 func TestDebitUser(t *testing.T) {

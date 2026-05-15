@@ -5,9 +5,10 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/shopspring/decimal"
+
 	"github.com/ndrewnee/backend-test-golang/internal/skinport"
 	"github.com/ndrewnee/backend-test-golang/internal/users"
-	"github.com/shopspring/decimal"
 )
 
 type PriceService interface {
