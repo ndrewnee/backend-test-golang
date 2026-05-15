@@ -12,7 +12,7 @@ A small Go HTTP service for the backend test assignment. It fetches Skinport ite
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `DATABASE_URL` | `postgres://postgres:postgres@localhost:5434/backend_test?sslmode=disable` | Postgres connection DSN |
+| `DATABASE_URL` | `postgres://postgres:postgres@localhost:5432/backend_test?sslmode=disable` | Postgres connection DSN |
 | `HTTP_ADDR` | `:8080` | HTTP server address |
 | `SKINPORT_BASE_URL` | `https://api.skinport.com/v1` | Skinport API base URL |
 | `SKINPORT_CACHE_TTL` | `5m` | In-memory cache TTL for `/items/prices` |
@@ -28,12 +28,12 @@ docker compose up --build
 ```
 
 The service will be available at `http://localhost:8080`.
-Postgres is published on `localhost:5434`. The application reaches it inside the Docker network as `db:5432`.
+Postgres is published on `localhost:5432`. The application reaches it inside the Docker network as `db:5432`.
 
 Run locally without Docker:
 
 ```bash
-export DATABASE_URL='postgres://postgres:postgres@localhost:5434/backend_test?sslmode=disable'
+export DATABASE_URL='postgres://postgres:postgres@localhost:5432/backend_test?sslmode=disable'
 go run ./cmd/server
 ```
 
@@ -147,5 +147,5 @@ Integration tests live in `tests/integration` behind the `integration` build tag
 Manual integration run:
 
 ```bash
-TEST_DATABASE_URL='postgres://postgres:postgres@localhost:5434/backend_test?sslmode=disable' go test -tags=integration ./tests/integration -count=1
+TEST_DATABASE_URL='postgres://postgres:postgres@localhost:5432/backend_test?sslmode=disable' go test -tags=integration ./tests/integration -count=1
 ```
