@@ -1,6 +1,10 @@
 package money
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+)
 
 func TestParseAmount(t *testing.T) {
 	t.Parallel()
@@ -26,17 +30,11 @@ func TestParseAmount(t *testing.T) {
 
 			got, err := ParseAmount(tt.raw)
 			if tt.wantErr {
-				if err == nil {
-					t.Fatal("expected error")
-				}
+				require.Error(t, err)
 				return
 			}
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-			if Format(got) != tt.want {
-				t.Fatalf("Format() = %s, want %s", Format(got), tt.want)
-			}
+			require.NoError(t, err)
+			require.Equal(t, tt.want, Format(got))
 		})
 	}
 }

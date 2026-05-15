@@ -11,7 +11,7 @@ lint:
 
 test-integration:
 	docker compose up -d db
-	docker compose run --rm test go test ./internal/users -run Integration -count=1
+	docker compose run --rm test go test -tags=integration ./... -run Integration -count=1
 
 build:
 	go build -o backend-test ./cmd/server

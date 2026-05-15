@@ -130,10 +130,16 @@ Lint:
 make lint
 ```
 
-Integration test with Postgres:
+Integration tests with Postgres:
 
 ```bash
 make test-integration
 ```
 
-The integration test uses `TEST_DATABASE_URL` and verifies concurrent debits so that the balance cannot go below zero.
+Integration tests are behind the `integration` build tag. They use `TEST_DATABASE_URL`, cover both HTTP business routes, and verify concurrent debits so that the balance cannot go below zero.
+
+Manual integration run:
+
+```bash
+TEST_DATABASE_URL='postgres://postgres:postgres@localhost:5434/backend_test?sslmode=disable' go test -tags=integration ./... -run Integration -count=1
+```

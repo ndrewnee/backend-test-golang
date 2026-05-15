@@ -9,6 +9,9 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestServicePricesMergesAndCachesSkinportItems(t *testing.T) {
@@ -18,15 +21,9 @@ func TestServicePricesMergesAndCachesSkinportItems(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		calls.Add(1)
 
-		if got := r.Header.Get("Accept-Encoding"); got != "br" {
-			t.Errorf("Accept-Encoding = %q, want br", got)
-		}
-		if got := r.URL.Query().Get("app_id"); got != "730" {
-			t.Errorf("app_id = %q, want 730", got)
-		}
-		if got := r.URL.Query().Get("currency"); got != "USD" {
-			t.Errorf("currency = %q, want USD", got)
-		}
+		assert.Equal(t, "br", r.Header.Get("Accept-Encoding"))
+		assert.Equal(t, "730", r.URL.Query().Get("app_id"))
+		assert.Equal(t, "USD", r.URL.Query().Get("currency"))
 
 		w.Header().Set("Content-Type", "application/json")
 		tradable := r.URL.Query().Get("tradable")
@@ -50,62 +47,38 @@ func TestServicePricesMergesAndCachesSkinportItems(t *testing.T) {
 	defer server.Close()
 
 	client, err := NewClient(server.URL, time.Second)
-	if err != nil {
-		t.Fatalf("NewClient() error = %v", err)
-	}
+	require.NoError(t, err)
 	service := NewService(client, time.Minute)
 
 	first, err := service.Prices(context.Background(), 730, "usd")
-	if err != nil {
-		t.Fatalf("Prices() error = %v", err)
-	}
+	require.NoError(t, err)
 	second, err := service.Prices(context.Background(), 730, "USD")
-	if err != nil {
-		t.Fatalf("Prices() cached error = %v", err)
-	}
+	require.NoError(t, err)
 
-	if calls.Load() != 2 {
-		t.Fatalf("Skinport calls = %d, want 2", calls.Load())
-	}
-	if len(first) != 2 {
-		t.Fatalf("len(first) = %d, want 2", len(first))
-	}
-	if len(second) != 2 {
-		t.Fatalf("len(second) = %d, want 2", len(second))
-	}
+	require.Equal(t, int64(2), calls.Load())
+	require.Len(t, first, 2)
+	require.Len(t, second, 2)
 
 	ak := first[0]
-	if ak.MarketHashName != "AK-47" {
-		t.Fatalf("first item = %s, want AK-47", ak.MarketHashName)
-	}
-	if stringValue(ak.TradableMinPrice) != "10.25" {
-		t.Fatalf("tradable min = %s, want 10.25", stringValue(ak.TradableMinPrice))
-	}
-	if stringValue(ak.NonTradableMinPrice) != "9.99" {
-		t.Fatalf("non-tradable min = %s, want 9.99", stringValue(ak.NonTradableMinPrice))
-	}
-	if first[1].TradableMinPrice != nil {
-		t.Fatalf("expected nil tradable min for second item, got %s", stringValue(first[1].TradableMinPrice))
-	}
+	require.Equal(t, "AK-47", ak.MarketHashName)
+	require.Equal(t, "10.25", stringValue(ak.TradableMinPrice))
+	require.Equal(t, "9.99", stringValue(ak.NonTradableMinPrice))
+	require.Nil(t, first[1].TradableMinPrice)
 }
 
 func TestNormalizeQuery(t *testing.T) {
 	t.Parallel()
 
 	appID, currency, err := NormalizeQuery(0, "")
-	if err != nil {
-		t.Fatalf("NormalizeQuery() error = %v", err)
-	}
-	if appID != DefaultAppID || currency != DefaultCurrency {
-		t.Fatalf("NormalizeQuery() = %d, %s", appID, currency)
-	}
+	require.NoError(t, err)
+	require.Equal(t, DefaultAppID, appID)
+	require.Equal(t, DefaultCurrency, currency)
 
-	if _, _, err := NormalizeQuery(-1, "USD"); err == nil {
-		t.Fatal("expected error for negative app_id")
-	}
-	if _, _, err := NormalizeQuery(730, "XXX"); err == nil {
-		t.Fatal("expected error for unsupported currency")
-	}
+	_, _, err = NormalizeQuery(-1, "USD")
+	require.Error(t, err)
+
+	_, _, err = NormalizeQuery(730, "XXX")
+	require.Error(t, err)
 }
 
 func TestClientDecodesBrotliResponse(t *testing.T) {
@@ -122,38 +95,34 @@ func TestClientDecodesBrotliResponse(t *testing.T) {
 			"quantity":         1,
 		}})
 		if err != nil {
-			t.Fatal(err)
+			assert.NoError(t, err)
+			return
 		}
 
 		writer := newBrotliHTTPWriter(w)
 		if _, err := writer.Write(payload); err != nil {
-			t.Fatal(err)
+			assert.NoError(t, err)
+			return
 		}
 		if err := writer.Close(); err != nil {
-			t.Fatal(err)
+			assert.NoError(t, err)
+			return
 		}
 
-		if got := r.URL.Query().Get("tradable"); got != "1" {
-			t.Errorf("tradable = %q, want 1", got)
-		}
+		assert.Equal(t, "1", r.URL.Query().Get("tradable"))
 		if _, err := strconv.Atoi(r.URL.Query().Get("app_id")); err != nil {
-			t.Errorf("app_id is not integer: %v", err)
+			assert.NoError(t, err)
 		}
 	}))
 	defer server.Close()
 
 	client, err := NewClient(server.URL, time.Second)
-	if err != nil {
-		t.Fatalf("NewClient() error = %v", err)
-	}
+	require.NoError(t, err)
 
 	items, err := client.FetchItems(context.Background(), 730, "EUR", true)
-	if err != nil {
-		t.Fatalf("FetchItems() error = %v", err)
-	}
-	if len(items) != 1 || items[0].MarketHashName != "Item" {
-		t.Fatalf("items = %#v", items)
-	}
+	require.NoError(t, err)
+	require.Len(t, items, 1)
+	require.Equal(t, "Item", items[0].MarketHashName)
 }
 
 func stringValue(value *string) string {

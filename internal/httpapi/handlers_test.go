@@ -13,6 +13,7 @@ import (
 	"github.com/ndrewnee/backend-test-golang/internal/skinport"
 	"github.com/ndrewnee/backend-test-golang/internal/users"
 	"github.com/shopspring/decimal"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDebitUser(t *testing.T) {
@@ -41,9 +42,7 @@ func TestDebitUser(t *testing.T) {
 
 			router.ServeHTTP(res, req)
 
-			if res.Code != tt.wantStatus {
-				t.Fatalf("status = %d, want %d; body=%s", res.Code, tt.wantStatus, res.Body.String())
-			}
+			require.Equal(t, tt.wantStatus, res.Code, res.Body.String())
 		})
 	}
 }
@@ -63,19 +62,14 @@ func TestItemsPrices(t *testing.T) {
 
 	router.ServeHTTP(res, req)
 
-	if res.Code != http.StatusOK {
-		t.Fatalf("status = %d, want 200; body=%s", res.Code, res.Body.String())
-	}
+	require.Equal(t, http.StatusOK, res.Code, res.Body.String())
 
 	var response struct {
 		Items []skinport.PriceItem `json:"items"`
 	}
-	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
-		t.Fatalf("decode response: %v", err)
-	}
-	if len(response.Items) != 1 || response.Items[0].MarketHashName != "AK-47" {
-		t.Fatalf("unexpected response: %#v", response)
-	}
+	require.NoError(t, json.NewDecoder(res.Body).Decode(&response))
+	require.Len(t, response.Items, 1)
+	require.Equal(t, "AK-47", response.Items[0].MarketHashName)
 }
 
 func TestItemsPricesValidation(t *testing.T) {
@@ -88,9 +82,7 @@ func TestItemsPricesValidation(t *testing.T) {
 
 	router.ServeHTTP(res, req)
 
-	if res.Code != http.StatusBadRequest {
-		t.Fatalf("status = %d, want 400; body=%s", res.Code, res.Body.String())
-	}
+	require.Equal(t, http.StatusBadRequest, res.Code, res.Body.String())
 }
 
 type stubPriceService struct {

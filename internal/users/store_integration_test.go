@@ -1,3 +1,5 @@
+//go:build integration
+
 package users
 
 import (
@@ -11,6 +13,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/ndrewnee/backend-test-golang/internal/db"
 	"github.com/ndrewnee/backend-test-golang/internal/money"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDebitConcurrentIntegration(t *testing.T) {
@@ -23,14 +26,10 @@ func TestDebitConcurrentIntegration(t *testing.T) {
 	defer cancel()
 
 	pool, err := pgxpool.New(ctx, databaseURL)
-	if err != nil {
-		t.Fatalf("connect database: %v", err)
-	}
+	require.NoError(t, err)
 	defer pool.Close()
 
-	if err := db.RunMigrations(ctx, pool); err != nil {
-		t.Fatalf("run migrations: %v", err)
-	}
+	require.NoError(t, db.RunMigrations(ctx, pool))
 
 	const userID = 99
 	_, err = pool.Exec(ctx, `
@@ -38,18 +37,12 @@ func TestDebitConcurrentIntegration(t *testing.T) {
 		VALUES ($1, 100.00)
 		ON CONFLICT (id) DO UPDATE SET balance = EXCLUDED.balance
 	`, userID)
-	if err != nil {
-		t.Fatalf("seed user: %v", err)
-	}
+	require.NoError(t, err)
 	_, err = pool.Exec(ctx, `DELETE FROM balance_debits WHERE user_id = $1`, userID)
-	if err != nil {
-		t.Fatalf("clean history: %v", err)
-	}
+	require.NoError(t, err)
 
 	amount, err := money.ParseAmount("60.00")
-	if err != nil {
-		t.Fatalf("parse amount: %v", err)
-	}
+	require.NoError(t, err)
 
 	store := NewStore(pool)
 	var wg sync.WaitGroup
@@ -74,19 +67,14 @@ func TestDebitConcurrentIntegration(t *testing.T) {
 		case errors.Is(err, ErrInsufficientFunds):
 			insufficientCount++
 		default:
-			t.Fatalf("unexpected debit error: %v", err)
+			require.NoError(t, err)
 		}
 	}
 
-	if successCount != 1 || insufficientCount != 1 {
-		t.Fatalf("success=%d insufficient=%d, want 1 and 1", successCount, insufficientCount)
-	}
+	require.Equal(t, 1, successCount)
+	require.Equal(t, 1, insufficientCount)
 
 	var balance string
-	if err := pool.QueryRow(ctx, `SELECT balance::text FROM users WHERE id = $1`, userID).Scan(&balance); err != nil {
-		t.Fatalf("read balance: %v", err)
-	}
-	if balance != "40.00" {
-		t.Fatalf("balance = %s, want 40.00", balance)
-	}
+	require.NoError(t, pool.QueryRow(ctx, `SELECT balance::text FROM users WHERE id = $1`, userID).Scan(&balance))
+	require.Equal(t, "40.00", balance)
 }
