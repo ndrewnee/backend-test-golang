@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -13,22 +12,8 @@ import (
 	"github.com/ndrewnee/backend-test-golang/internal/money"
 )
 
-var (
-	ErrUserNotFound      = errors.New("user not found")
-	ErrInsufficientFunds = errors.New("insufficient funds")
-)
-
 type Store struct {
 	pool *pgxpool.Pool
-}
-
-type DebitRecord struct {
-	ID            int64     `json:"id"`
-	UserID        int64     `json:"user_id"`
-	Amount        string    `json:"amount"`
-	BalanceBefore string    `json:"balance_before"`
-	BalanceAfter  string    `json:"balance_after"`
-	CreatedAt     time.Time `json:"created_at"`
 }
 
 func NewStore(pool *pgxpool.Pool) *Store {

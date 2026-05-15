@@ -2,8 +2,6 @@ package prices
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -17,11 +15,6 @@ import (
 const (
 	DefaultAppID    = 730
 	DefaultCurrency = "EUR"
-)
-
-var (
-	ErrInvalidAppID        = errors.New("app_id must be positive")
-	ErrUnsupportedCurrency = errors.New("unsupported currency")
 )
 
 var supportedCurrencies = map[string]struct{}{
@@ -47,21 +40,6 @@ type Service struct {
 type cacheEntry struct {
 	items     []PriceItem
 	expiresAt time.Time
-}
-
-type PriceItem struct {
-	MarketHashName      string  `json:"market_hash_name"`
-	Currency            string  `json:"currency"`
-	SuggestedPrice      *string `json:"suggested_price"`
-	ItemPage            string  `json:"item_page"`
-	MarketPage          string  `json:"market_page"`
-	Quantity            int     `json:"quantity"`
-	TradableMinPrice    *string `json:"tradable_min_price"`
-	NonTradableMinPrice *string `json:"non_tradable_min_price"`
-	TradableQuantity    int     `json:"tradable_quantity"`
-	NonTradableQuantity int     `json:"non_tradable_quantity"`
-	SkinportCreatedAt   int64   `json:"skinport_created_at"`
-	SkinportUpdatedAt   int64   `json:"skinport_updated_at"`
 }
 
 func NewService(fetcher Fetcher, ttl time.Duration) *Service {
@@ -179,27 +157,6 @@ func mergeItems(tradableItems, nonTradableItems []Item) []PriceItem {
 	})
 
 	return merged
-}
-
-func priceItemFromSkinport(item Item) PriceItem {
-	return PriceItem{
-		MarketHashName:    item.MarketHashName,
-		Currency:          item.Currency,
-		SuggestedPrice:    jsonNumberString(item.SuggestedPrice),
-		ItemPage:          item.ItemPage,
-		MarketPage:        item.MarketPage,
-		Quantity:          item.Quantity,
-		SkinportCreatedAt: item.CreatedAt,
-		SkinportUpdatedAt: item.UpdatedAt,
-	}
-}
-
-func jsonNumberString(number *json.Number) *string {
-	if number == nil {
-		return nil
-	}
-	value := number.String()
-	return &value
 }
 
 func cacheKey(appID int, currency string) string {

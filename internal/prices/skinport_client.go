@@ -19,21 +19,6 @@ type Client struct {
 	httpClient *http.Client
 }
 
-type Item struct {
-	MarketHashName string       `json:"market_hash_name"`
-	Currency       string       `json:"currency"`
-	SuggestedPrice *json.Number `json:"suggested_price"`
-	ItemPage       string       `json:"item_page"`
-	MarketPage     string       `json:"market_page"`
-	MinPrice       *json.Number `json:"min_price"`
-	MaxPrice       *json.Number `json:"max_price"`
-	MeanPrice      *json.Number `json:"mean_price"`
-	MedianPrice    *json.Number `json:"median_price"`
-	Quantity       int          `json:"quantity"`
-	CreatedAt      int64        `json:"created_at"`
-	UpdatedAt      int64        `json:"updated_at"`
-}
-
 func NewClient(rawBaseURL string, timeout time.Duration) (*Client, error) {
 	parsed, err := url.Parse(rawBaseURL)
 	if err != nil {
