@@ -30,12 +30,12 @@ func TestItemsIntegration(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 
-	var body dto.ItemsResponse
+	var body []dto.Item
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&body))
-	require.Len(t, body.Items, 1)
-	require.Equal(t, "AK-47", body.Items[0].MarketHashName)
-	require.Equal(t, "10.25", stringValue(body.Items[0].TradableMinPrice))
-	require.Equal(t, "9.99", stringValue(body.Items[0].NonTradableMinPrice))
+	require.Len(t, body, 1)
+	require.Equal(t, "AK-47", body[0].MarketHashName)
+	require.Equal(t, "10.25", stringValue(body[0].TradableMinPrice))
+	require.Equal(t, "9.99", stringValue(body[0].NonTradableMinPrice))
 	require.Equal(t, int64(2), skinportCalls.Load())
 }
 

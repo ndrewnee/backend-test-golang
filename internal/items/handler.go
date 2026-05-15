@@ -49,7 +49,10 @@ func (h *Handler) Items(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, dto.ItemsResponse{Items: items})
+	if items == nil {
+		items = []dto.Item{}
+	}
+	writeJSON(w, http.StatusOK, items)
 }
 
 func writeJSON(w http.ResponseWriter, status int, value any) {

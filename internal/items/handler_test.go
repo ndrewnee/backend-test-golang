@@ -29,10 +29,23 @@ func TestHandlerItems(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, res.Code, res.Body.String())
 
-	var response dto.ItemsResponse
+	var response []dto.Item
 	require.NoError(t, json.NewDecoder(res.Body).Decode(&response))
-	require.Len(t, response.Items, 1)
-	require.Equal(t, "AK-47", response.Items[0].MarketHashName)
+	require.Len(t, response, 1)
+	require.Equal(t, "AK-47", response[0].MarketHashName)
+}
+
+func TestHandlerItemsEmptyResponse(t *testing.T) {
+	t.Parallel()
+
+	handler := NewHandler(stubItemsService{})
+	req := httptest.NewRequest(http.MethodGet, "/items", nil)
+	res := httptest.NewRecorder()
+
+	handler.Items(res, req)
+
+	require.Equal(t, http.StatusOK, res.Code, res.Body.String())
+	require.JSONEq(t, `[]`, res.Body.String())
 }
 
 func TestHandlerItemsValidation(t *testing.T) {

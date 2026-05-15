@@ -62,24 +62,22 @@ The `app_id` and `currency` query parameters are optional. Defaults are `730` an
 The endpoint performs two Skinport `/v1/items` requests, one with `tradable=1` and one with `tradable=0`. It merges items by `market_hash_name` and returns both minimum prices:
 
 ```json
-{
-  "items": [
-    {
-      "market_hash_name": "AK-47 | Aquamarine Revenge (Battle-Scarred)",
-      "currency": "USD",
-      "suggested_price": "13.18",
-      "item_page": "https://skinport.com/item/...",
-      "market_page": "https://skinport.com/market/...",
-      "quantity": 25,
-      "tradable_min_price": "11.33",
-      "non_tradable_min_price": "10.90",
-      "tradable_quantity": 25,
-      "non_tradable_quantity": 4,
-      "skinport_created_at": 1535988253,
-      "skinport_updated_at": 1568073728
-    }
-  ]
-}
+[
+  {
+    "market_hash_name": "AK-47 | Aquamarine Revenge (Battle-Scarred)",
+    "currency": "USD",
+    "suggested_price": "13.18",
+    "item_page": "https://skinport.com/item/...",
+    "market_page": "https://skinport.com/market/...",
+    "quantity": 25,
+    "tradable_min_price": "11.33",
+    "non_tradable_min_price": "10.90",
+    "tradable_quantity": 25,
+    "non_tradable_quantity": 4,
+    "skinport_created_at": 1535988253,
+    "skinport_updated_at": 1568073728
+  }
+]
 ```
 
 ### Debit user balance
