@@ -1,10 +1,13 @@
-.PHONY: run test test-integration build up down
+.PHONY: run test test-integration lint build up down
 
 run:
 	go run ./cmd/server
 
 test:
 	go test ./...
+
+lint:
+	golangci-lint run ./...
 
 test-integration:
 	docker compose up -d db

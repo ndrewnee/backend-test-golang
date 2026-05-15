@@ -76,7 +76,9 @@ func (c *Client) FetchItems(ctx context.Context, appID int, currency string, tra
 	if err != nil {
 		return nil, fmt.Errorf("fetch skinport items: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
