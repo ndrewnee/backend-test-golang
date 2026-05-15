@@ -142,10 +142,10 @@ Integration tests with Postgres:
 make test-integration
 ```
 
-Integration tests are behind the `integration` build tag. They use `TEST_DATABASE_URL`, cover both HTTP business routes, and verify concurrent debits so that the balance cannot go below zero.
+Integration tests live in `tests/integration` behind the `integration` build tag. They use `TEST_DATABASE_URL`, cover both HTTP business routes, and verify concurrent debits so that the balance cannot go below zero.
 
 Manual integration run:
 
 ```bash
-TEST_DATABASE_URL='postgres://postgres:postgres@localhost:5434/backend_test?sslmode=disable' go test -tags=integration ./... -run Integration -count=1
+TEST_DATABASE_URL='postgres://postgres:postgres@localhost:5434/backend_test?sslmode=disable' go test -tags=integration ./tests/integration -count=1
 ```

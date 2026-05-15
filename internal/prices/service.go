@@ -10,6 +10,8 @@ import (
 
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/singleflight"
+
+	"github.com/ndrewnee/backend-test-golang/internal/dto"
 )
 
 const (
@@ -38,7 +40,7 @@ type Service struct {
 }
 
 type cacheEntry struct {
-	items     []PriceItem
+	items     []dto.PriceItem
 	expiresAt time.Time
 }
 
@@ -51,7 +53,7 @@ func NewService(fetcher Fetcher, ttl time.Duration) *Service {
 	}
 }
 
-func (s *Service) Prices(ctx context.Context, appID int, currency string) ([]PriceItem, error) {
+func (s *Service) Prices(ctx context.Context, appID int, currency string) ([]dto.PriceItem, error) {
 	appID, currency, err := NormalizeQuery(appID, currency)
 	if err != nil {
 		return nil, err
@@ -78,7 +80,7 @@ func (s *Service) Prices(ctx context.Context, appID int, currency string) ([]Pri
 		return nil, err
 	}
 
-	items, ok := value.([]PriceItem)
+	items, ok := value.([]dto.PriceItem)
 	if !ok {
 		return nil, fmt.Errorf("unexpected cache value type")
 	}
@@ -104,7 +106,7 @@ func NormalizeQuery(appID int, currency string) (int, string, error) {
 	return appID, currency, nil
 }
 
-func (s *Service) fetchAndMerge(ctx context.Context, appID int, currency string) ([]PriceItem, error) {
+func (s *Service) fetchAndMerge(ctx context.Context, appID int, currency string) ([]dto.PriceItem, error) {
 	var tradableItems []Item
 	var nonTradableItems []Item
 
@@ -127,8 +129,8 @@ func (s *Service) fetchAndMerge(ctx context.Context, appID int, currency string)
 	return mergeItems(tradableItems, nonTradableItems), nil
 }
 
-func mergeItems(tradableItems, nonTradableItems []Item) []PriceItem {
-	byName := make(map[string]*PriceItem, len(tradableItems)+len(nonTradableItems))
+func mergeItems(tradableItems, nonTradableItems []Item) []dto.PriceItem {
+	byName := make(map[string]*dto.PriceItem, len(tradableItems)+len(nonTradableItems))
 
 	for _, item := range tradableItems {
 		price := priceItemFromSkinport(item)
@@ -148,7 +150,7 @@ func mergeItems(tradableItems, nonTradableItems []Item) []PriceItem {
 		price.NonTradableQuantity = item.Quantity
 	}
 
-	merged := make([]PriceItem, 0, len(byName))
+	merged := make([]dto.PriceItem, 0, len(byName))
 	for _, item := range byName {
 		merged = append(merged, *item)
 	}
@@ -163,7 +165,7 @@ func cacheKey(appID int, currency string) string {
 	return fmt.Sprintf("%d:%s", appID, currency)
 }
 
-func (s *Service) getCached(key string) ([]PriceItem, bool) {
+func (s *Service) getCached(key string) ([]dto.PriceItem, bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -174,7 +176,7 @@ func (s *Service) getCached(key string) ([]PriceItem, bool) {
 	return clonePriceItems(entry.items), true
 }
 
-func (s *Service) setCached(key string, items []PriceItem) {
+func (s *Service) setCached(key string, items []dto.PriceItem) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -184,11 +186,11 @@ func (s *Service) setCached(key string, items []PriceItem) {
 	}
 }
 
-func clonePriceItems(items []PriceItem) []PriceItem {
+func clonePriceItems(items []dto.PriceItem) []dto.PriceItem {
 	if items == nil {
 		return nil
 	}
-	cloned := make([]PriceItem, len(items))
+	cloned := make([]dto.PriceItem, len(items))
 	copy(cloned, items)
 	return cloned
 }

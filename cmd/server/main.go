@@ -57,11 +57,15 @@ func run() error {
 	}
 
 	priceService := prices.NewService(skinportClient, cfg.SkinportCacheTTL)
-	userStore := users.NewStore(pool)
+	priceHandler := prices.NewHandler(priceService)
+
+	userRepository := users.NewRepository(pool)
+	userService := users.NewService(userRepository)
+	userHandler := users.NewHandler(userService)
 
 	server := &http.Server{
 		Addr:              cfg.HTTPAddr,
-		Handler:           httpapi.NewRouter(priceService, userStore),
+		Handler:           httpapi.NewRouter(priceHandler, userHandler),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 

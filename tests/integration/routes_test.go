@@ -1,6 +1,6 @@
 //go:build integration
 
-package httpapi_test
+package integration_test
 
 import (
 	"bytes"
@@ -18,6 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ndrewnee/backend-test-golang/internal/db"
+	"github.com/ndrewnee/backend-test-golang/internal/dto"
 	"github.com/ndrewnee/backend-test-golang/internal/httpapi"
 	"github.com/ndrewnee/backend-test-golang/internal/prices"
 	"github.com/ndrewnee/backend-test-golang/internal/users"
@@ -44,9 +45,12 @@ func TestRoutesIntegration(t *testing.T) {
 	skinportClient, err := prices.NewClient(skinportServer.URL, time.Second)
 	require.NoError(t, err)
 
+	priceService := prices.NewService(skinportClient, time.Minute)
+	userRepository := users.NewRepository(pool)
+	userService := users.NewService(userRepository)
 	router := httpapi.NewRouter(
-		prices.NewService(skinportClient, time.Minute),
-		users.NewStore(pool),
+		prices.NewHandler(priceService),
+		users.NewHandler(userService),
 	)
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -60,9 +64,7 @@ func TestRoutesIntegration(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, resp.StatusCode)
 
-		var body struct {
-			Items []prices.PriceItem `json:"items"`
-		}
+		var body dto.ItemsPricesResponse
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&body))
 		require.Len(t, body.Items, 1)
 		require.Equal(t, "AK-47", body.Items[0].MarketHashName)
@@ -96,7 +98,7 @@ func TestRoutesIntegration(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, resp.StatusCode)
 
-		var record users.DebitRecord
+		var record dto.DebitResponse
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&record))
 		require.Equal(t, userID, record.UserID)
 		require.Equal(t, "25.50", record.Amount)

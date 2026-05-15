@@ -1,34 +1,31 @@
 package httpapi
 
 import (
-	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/shopspring/decimal"
 
+	"github.com/ndrewnee/backend-test-golang/internal/dto"
 	"github.com/ndrewnee/backend-test-golang/internal/prices"
 	"github.com/ndrewnee/backend-test-golang/internal/users"
 )
 
-type PriceService interface {
-	Prices(ctx context.Context, appID int, currency string) ([]prices.PriceItem, error)
-}
-
-type UserService interface {
-	Debit(ctx context.Context, userID int64, amount decimal.Decimal) (users.DebitRecord, error)
-}
-
-func NewRouter(priceService PriceService, userService UserService) http.Handler {
-	handler := &Handler{
-		priceService: priceService,
-		userService:  userService,
-	}
-
+func NewRouter(priceHandler *prices.Handler, userHandler *users.Handler) http.Handler {
 	router := chi.NewRouter()
-	router.Get("/healthz", handler.healthz)
-	router.Get("/items/prices", handler.itemsPrices)
-	router.Post("/users/{id}/debit", handler.debitUser)
+	router.Get("/healthz", healthz)
+	router.Get("/items/prices", priceHandler.ItemsPrices)
+	router.Post("/users/{id}/debit", userHandler.DebitUser)
 
 	return router
+}
+
+func healthz(w http.ResponseWriter, _ *http.Request) {
+	writeJSON(w, http.StatusOK, dto.HealthResponse{Status: "ok"})
+}
+
+func writeJSON(w http.ResponseWriter, status int, value any) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	_ = json.NewEncoder(w).Encode(value)
 }

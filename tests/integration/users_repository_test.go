@@ -1,6 +1,6 @@
 //go:build integration
 
-package users
+package integration_test
 
 import (
 	"context"
@@ -15,6 +15,7 @@ import (
 
 	"github.com/ndrewnee/backend-test-golang/internal/db"
 	"github.com/ndrewnee/backend-test-golang/internal/money"
+	"github.com/ndrewnee/backend-test-golang/internal/users"
 )
 
 func TestDebitConcurrentIntegration(t *testing.T) {
@@ -45,14 +46,14 @@ func TestDebitConcurrentIntegration(t *testing.T) {
 	amount, err := money.ParseAmount("60.00")
 	require.NoError(t, err)
 
-	store := NewStore(pool)
+	repository := users.NewRepository(pool)
 	var wg sync.WaitGroup
 	errs := make(chan error, 2)
 	for i := 0; i < 2; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			_, err := store.Debit(ctx, userID, amount)
+			_, err := repository.Debit(ctx, userID, amount)
 			errs <- err
 		}()
 	}
@@ -65,7 +66,7 @@ func TestDebitConcurrentIntegration(t *testing.T) {
 		switch {
 		case err == nil:
 			successCount++
-		case errors.Is(err, ErrInsufficientFunds):
+		case errors.Is(err, users.ErrInsufficientFunds):
 			insufficientCount++
 		default:
 			require.NoError(t, err)
