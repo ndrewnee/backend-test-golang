@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
     balance NUMERIC(18,2) NOT NULL CHECK (balance >= 0)
 );
 
-CREATE TABLE IF NOT EXISTS balance_debits (
+CREATE TABLE IF NOT EXISTS balance_transactions (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id),
     amount NUMERIC(18,2) NOT NULL CHECK (amount > 0),
@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS balance_debits (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS balance_debits_user_created_idx
-    ON balance_debits(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS balance_transactions_user_created_idx
+    ON balance_transactions(user_id, created_at DESC);
 
 INSERT INTO users (id, balance)
 VALUES (1, 1000.00)

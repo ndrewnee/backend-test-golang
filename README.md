@@ -103,7 +103,7 @@ Response:
 }
 ```
 
-The balance cannot become negative. Debit is executed in a transaction with `SELECT ... FOR UPDATE`, and each operation is written to `balance_debits`.
+The balance cannot become negative. Debit is executed in a transaction with `SELECT ... FOR UPDATE`, and each operation is written to `balance_transactions`.
 
 ## Database
 
@@ -112,7 +112,7 @@ Migrations are embedded into the application and run on startup when `RUN_MIGRAT
 Created tables:
 
 - `users(id, balance)`
-- `balance_debits(id, user_id, amount, balance_before, balance_after, created_at)`
+- `balance_transactions(id, user_id, amount, balance_before, balance_after, created_at)`
 
 Seed data: user `id=1` with balance `1000.00`.
 

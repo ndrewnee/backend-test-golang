@@ -63,7 +63,7 @@ func TestUsersDebitRouteIntegration(t *testing.T) {
 	require.Equal(t, "174.50", balance)
 
 	var historyCount int
-	require.NoError(t, pool.QueryRow(ctx, `SELECT count(*) FROM balance_debits WHERE user_id = $1`, userID).Scan(&historyCount))
+	require.NoError(t, pool.QueryRow(ctx, `SELECT count(*) FROM balance_transactions WHERE user_id = $1`, userID).Scan(&historyCount))
 	require.Equal(t, 1, historyCount)
 }
 
@@ -77,7 +77,7 @@ func TestUsersDebitConcurrentIntegration(t *testing.T) {
 		ON CONFLICT (id) DO UPDATE SET balance = EXCLUDED.balance
 	`, userID)
 	require.NoError(t, err)
-	_, err = pool.Exec(ctx, `DELETE FROM balance_debits WHERE user_id = $1`, userID)
+	_, err = pool.Exec(ctx, `DELETE FROM balance_transactions WHERE user_id = $1`, userID)
 	require.NoError(t, err)
 
 	amount, err := money.ParseAmount("60.00")

@@ -18,7 +18,7 @@ func TestServiceDebit(t *testing.T) {
 
 	createdAt := time.Unix(1, 0).UTC()
 	service := NewService(&stubDebitRepository{
-		record: models.BalanceDebit{
+		record: models.BalanceTransaction{
 			ID:            1,
 			UserID:        42,
 			Amount:        "25.50",
@@ -76,15 +76,15 @@ func TestServiceDebitRepositoryErrors(t *testing.T) {
 }
 
 type stubDebitRepository struct {
-	record models.BalanceDebit
+	record models.BalanceTransaction
 	err    error
 	called bool
 }
 
-func (r *stubDebitRepository) Debit(_ context.Context, _ int64, _ decimal.Decimal) (models.BalanceDebit, error) {
+func (r *stubDebitRepository) Debit(_ context.Context, _ int64, _ decimal.Decimal) (models.BalanceTransaction, error) {
 	r.called = true
 	if r.err != nil {
-		return models.BalanceDebit{}, r.err
+		return models.BalanceTransaction{}, r.err
 	}
 	return r.record, nil
 }

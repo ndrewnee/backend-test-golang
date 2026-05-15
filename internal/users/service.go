@@ -11,7 +11,7 @@ import (
 )
 
 type UserRepository interface {
-	Debit(ctx context.Context, userID int64, amount decimal.Decimal) (models.BalanceDebit, error)
+	Debit(ctx context.Context, userID int64, amount decimal.Decimal) (models.BalanceTransaction, error)
 }
 
 type Service struct {
@@ -36,7 +36,7 @@ func (s *Service) Debit(ctx context.Context, userID int64, request dto.DebitRequ
 	return debitResponseFromModel(record), nil
 }
 
-func debitResponseFromModel(record models.BalanceDebit) dto.DebitResponse {
+func debitResponseFromModel(record models.BalanceTransaction) dto.DebitResponse {
 	return dto.DebitResponse{
 		ID:            record.ID,
 		UserID:        record.UserID,
